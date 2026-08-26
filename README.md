@@ -28,9 +28,27 @@ npm install
 npm run develop               # http://localhost:1337/admin
 ```
 
-On first launch, create the admin account through the interface.
+On first launch, create the admin account through the interface. It is needed to browse the
+data, but not to run the walkthrough below: the workflow endpoints are unauthenticated.
 
-Generate each secret with `openssl rand -base64 32`. `APP_KEYS` takes at least two
+`.env` needs seven generated secrets. To fill them in one go:
+
+```bash
+cp .env.example .env
+python3 - <<'PY'
+import subprocess, re, pathlib
+rnd = lambda: subprocess.check_output(['openssl','rand','-base64','32']).decode().strip()
+p = pathlib.Path('.env'); t = p.read_text()
+t = t.replace('APP_KEYS=', f'APP_KEYS={rnd()},{rnd()}', 1)
+for k in ['API_TOKEN_SALT','ADMIN_JWT_SECRET','TRANSFER_TOKEN_SALT','JWT_SECRET','ENCRYPTION_KEY']:
+    t = re.sub(rf'^{k}=$', f'{k}={rnd()}', t, count=1, flags=re.M)
+pw = subprocess.check_output(['openssl','rand','-hex','24']).decode().strip()
+t = re.sub(r'^DATABASE_PASSWORD=$', f'DATABASE_PASSWORD={pw}', t, count=1, flags=re.M)
+p.write_text(t)
+PY
+```
+
+Or fill them by hand: each is `openssl rand -base64 32`, and `APP_KEYS` takes at least two
 comma-separated keys.
 
 ## Environment variables
@@ -179,17 +197,26 @@ returning a fake success would store the id of a listing that does not exist.
 ## Tests
 
 ```bash
-npm test
+npm test                 # 22 unit tests, ~200 ms, no database and no network
+npm run test:integration # 6 tests, boots Strapi against the real database
 ```
 
-22 unit tests, no database and no network:
+Unit tests:
 
 - `src/utils/sku.test.ts` — format, padding, overflow past 999999, invalid values
 - `src/discogs/completeness.test.ts` — one case per business rule, error accumulation
 - `src/discogs/mock-connector.test.ts` — search, unknown release, listing ids, failure path
 - `src/discogs/index.test.ts` — mock/api selection, refusal of api mode without a token
 
-`npm run e2e` covers the HTTP layer against a running server.
+They are deliberately kept offline, so `npm test` passes with the database stopped.
+
+Integration test — `tests/integration/publish-discogs.test.ts` boots Strapi, listens on a
+real socket and exercises `publish-discogs` end to end: refusal while incomplete, the
+`failed` listing recorded, publication with its external identifiers, both journal entries,
+and a cross-tenant request returning 404. It needs `docker compose up -d` and no server
+already listening on the configured port.
+
+`npm run e2e` additionally walks the full workflow against a running server.
 
 ## Scripts
 
@@ -197,7 +224,8 @@ npm test
 |---|---|
 | `npm run develop` | dev server, watch mode |
 | `npm run build` / `npm start` | production build and run |
-| `npm test` | unit tests |
+| `npm test` | unit tests (offline) |
+| `npm run test:integration` | integration test, needs the database |
 | `npm run seed` | demo data (`--reset` to recreate from scratch) |
 | `npm run e2e` | full workflow against a running server |
 
