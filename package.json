@@ -14,7 +14,8 @@
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seed": "node scripts/seed.js"
   },
   "dependencies": {
     "@strapi/database": "5.52.2",

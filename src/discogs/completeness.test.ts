@@ -15,8 +15,24 @@ const codesFor = (unit: ListingCandidate) =>
   validateListingPayload(unit).issues.map((issue) => issue.code);
 
 describe('validateListingPayload', () => {
-  it('accepts a complete unit', () => {
-    expect(validateListingPayload(publishable)).toEqual({ valid: true, issues: [] });
+  it('accepts a complete unit and returns the payload it validated', () => {
+    const result = validateListingPayload({ ...publishable, sellerComment: 'Sleeve slightly worn' });
+
+    expect(result.valid).toBe(true);
+    expect(result.issues).toEqual([]);
+    expect(result.payload).toEqual({
+      releaseId: '123456',
+      price: 29.9,
+      currency: 'EUR',
+      quantity: 1,
+      mediaCondition: 'NEAR_MINT',
+      sleeveCondition: 'VERY_GOOD_PLUS',
+      comments: 'Sleeve slightly worn',
+    });
+  });
+
+  it('returns no payload when the unit is not publishable', () => {
+    expect(validateListingPayload({ ...publishable, price: 0 }).payload).toBeUndefined();
   });
 
   it('rejects a unit with no product', () => {

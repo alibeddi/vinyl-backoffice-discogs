@@ -49,11 +49,5 @@ export function createMockDiscogsConnector(): DiscogsConnector {
         externalUrl: `${LISTING_URL_PREFIX}${externalListingId}`,
       };
     },
-
-    async removeListing(externalListingId: string): Promise<void> {
-      if (!externalListingId) {
-        throw new DiscogsApiError('An external listing id is required to remove a listing.');
-      }
-    },
   };
 }

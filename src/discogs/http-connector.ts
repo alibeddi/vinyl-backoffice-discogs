@@ -114,11 +114,5 @@ export function createHttpDiscogsConnector(config: DiscogsConfig): DiscogsConnec
         'Publishing to the real Discogs Marketplace requires OAuth 1.0a. Use DISCOGS_MODE=mock.'
       );
     },
-
-    async removeListing(): Promise<void> {
-      throw new DiscogsApiError(
-        'Removing a real Discogs listing requires OAuth 1.0a. Use DISCOGS_MODE=mock.'
-      );
-    },
   };
 }

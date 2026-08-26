@@ -16,7 +16,6 @@ export interface DiscogsConnector {
   searchReleases(query: string): Promise<DiscogsSearchResult[]>;
   getRelease(releaseId: string): Promise<DiscogsRelease | null>;
   publishListing(payload: ListingPayload): Promise<PublishedListing>;
-  removeListing(externalListingId: string): Promise<void>;
 }
 
 /** Lets the workflow distinguish a marketplace failure from a validation failure. */
