@@ -52,6 +52,12 @@ comma-separated keys.
 `docker-compose.yml` reads the database variables from the same `.env` and fails with an
 explicit message if they are missing, rather than starting with a default password.
 
+`config/database.ts` is Strapi's generated file and was left untouched, so it also accepts
+the standard optional variables — `DATABASE_URL` (connection string instead of the
+individual fields), `DATABASE_SCHEMA`, `DATABASE_POOL_MIN` / `DATABASE_POOL_MAX`,
+`DATABASE_CONNECTION_TIMEOUT` and the `DATABASE_SSL_*` family. They keep Strapi's defaults
+and none of them is needed to run locally.
+
 ## Data model
 
 ```
