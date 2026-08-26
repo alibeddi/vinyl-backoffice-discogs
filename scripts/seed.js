@@ -12,6 +12,32 @@ const { compileStrapi, createStrapi } = require('@strapi/strapi');
 
 const TENANT_SLUG = 'test-tenant';
 
+/** Order matters: children before the tenant they point to. */
+const OWNED_BY_TENANT = [
+  'api::marketplace-sync-event.marketplace-sync-event',
+  'api::channel-listing.channel-listing',
+  'api::sellable-unit.sellable-unit',
+  'api::product.product',
+];
+
+async function resetTenantData(app) {
+  const tenant = await app.documents('api::tenant.tenant').findFirst({
+    filters: { slug: TENANT_SLUG },
+  });
+  if (!tenant) return;
+
+  for (const uid of OWNED_BY_TENANT) {
+    const documents = await app.documents(uid).findMany({
+      filters: { tenant: { documentId: tenant.documentId } },
+    });
+    for (const document of documents) {
+      await app.documents(uid).delete({ documentId: document.documentId });
+    }
+  }
+
+  await app.documents('api::tenant.tenant').delete({ documentId: tenant.documentId });
+}
+
 async function findOrCreateTenant(app) {
   const existing = await app.documents('api::tenant.tenant').findFirst({
     filters: { slug: TENANT_SLUG },
@@ -67,6 +93,10 @@ async function findOrCreateUnit(app, tenantId, productId) {
   const app = await createStrapi(await compileStrapi()).load();
 
   try {
+    if (process.argv.includes('--reset')) {
+      await resetTenantData(app);
+    }
+
     const tenant = await findOrCreateTenant(app);
     const product = await findOrCreateProduct(app, tenant.documentId);
     const unit = await findOrCreateUnit(app, tenant.documentId, product.documentId);

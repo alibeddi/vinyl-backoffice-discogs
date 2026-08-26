@@ -15,7 +15,8 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "e2e": "bash scripts/e2e-workflow.sh"
   },
   "dependencies": {
     "@strapi/database": "5.52.2",
