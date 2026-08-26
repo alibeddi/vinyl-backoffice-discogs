@@ -443,6 +443,309 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiChannelListingChannelListing
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'channel_listings';
+  info: {
+    description: 'Publication state of a sellable unit on one marketplace channel.';
+    displayName: 'Channel Listing';
+    pluralName: 'channel-listings';
+    singularName: 'channel-listing';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    channel: Schema.Attribute.Enumeration<['discogs']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'discogs'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    externalListingId: Schema.Attribute.String;
+    externalUrl: Schema.Attribute.String;
+    lastErrorMessage: Schema.Attribute.Text;
+    lastSyncedAt: Schema.Attribute.DateTime;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::channel-listing.channel-listing'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    publishedPrice: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    sellableUnit: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::sellable-unit.sellable-unit'
+    > &
+      Schema.Attribute.Required;
+    status: Schema.Attribute.Enumeration<
+      [
+        'not_published',
+        'pending',
+        'published',
+        'failed',
+        'removed',
+        'sync_error',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'not_published'>;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'> &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMarketplaceSyncEventMarketplaceSyncEvent
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'marketplace_sync_events';
+  info: {
+    description: 'Persistent business log of every marketplace operation, successful or failed.';
+    displayName: 'Marketplace Sync Event';
+    pluralName: 'marketplace-sync-events';
+    singularName: 'marketplace-sync-event';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    action: Schema.Attribute.Enumeration<
+      [
+        'search_release',
+        'attach_release',
+        'check_completeness',
+        'publish_listing',
+        'mark_out_of_stock',
+      ]
+    > &
+      Schema.Attribute.Required;
+    channel: Schema.Attribute.Enumeration<['discogs']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'discogs'>;
+    channelListing: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::channel-listing.channel-listing'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::marketplace-sync-event.marketplace-sync-event'
+    > &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text & Schema.Attribute.Required;
+    occurredAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    payload: Schema.Attribute.JSON;
+    product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'>;
+    publishedAt: Schema.Attribute.DateTime;
+    sellableUnit: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::sellable-unit.sellable-unit'
+    >;
+    status: Schema.Attribute.Enumeration<['success', 'error']> &
+      Schema.Attribute.Required;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'> &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiProductProduct extends Struct.CollectionTypeSchema {
+  collectionName: 'products';
+  info: {
+    description: 'Catalogue record describing a vinyl release, independent of any physical copy.';
+    displayName: 'Product';
+    pluralName: 'products';
+    singularName: 'product';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    artist: Schema.Attribute.String & Schema.Attribute.Required;
+    barcode: Schema.Attribute.String;
+    catalogReference: Schema.Attribute.String;
+    country: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    discogsMasterId: Schema.Attribute.String;
+    discogsReleaseId: Schema.Attribute.String;
+    format: Schema.Attribute.String;
+    label: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product.product'
+    > &
+      Schema.Attribute.Private;
+    productType: Schema.Attribute.Enumeration<['vinyl']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'vinyl'>;
+    publishedAt: Schema.Attribute.DateTime;
+    sellableUnits: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sellable-unit.sellable-unit'
+    >;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'> &
+      Schema.Attribute.Required;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    year: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1860;
+        },
+        number
+      >;
+  };
+}
+
+export interface ApiSellableUnitSellableUnit
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'sellable_units';
+  info: {
+    description: 'One physical copy of a catalogue product, with its own price, grading and sale status.';
+    displayName: 'Sellable Unit';
+    pluralName: 'sellable-units';
+    singularName: 'sellable-unit';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    channelListing: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::channel-listing.channel-listing'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    currency: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 3;
+        minLength: 3;
+      }> &
+      Schema.Attribute.DefaultTo<'EUR'>;
+    internalLocation: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sellable-unit.sellable-unit'
+    > &
+      Schema.Attribute.Private;
+    mediaCondition: Schema.Attribute.Enumeration<
+      [
+        'MINT',
+        'NEAR_MINT',
+        'VERY_GOOD_PLUS',
+        'VERY_GOOD',
+        'GOOD_PLUS',
+        'GOOD',
+        'FAIR',
+        'POOR',
+      ]
+    >;
+    price: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'> &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    quantity: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
+    saleStatus: Schema.Attribute.Enumeration<
+      ['available', 'reserved', 'sold', 'out_of_stock', 'archived']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'available'>;
+    sellerComment: Schema.Attribute.Text;
+    sku: Schema.Attribute.String & Schema.Attribute.Unique;
+    sleeveCondition: Schema.Attribute.Enumeration<
+      [
+        'MINT',
+        'NEAR_MINT',
+        'VERY_GOOD_PLUS',
+        'VERY_GOOD',
+        'GOOD_PLUS',
+        'GOOD',
+        'FAIR',
+        'POOR',
+        'GENERIC',
+        'NO_COVER',
+        'NOT_GRADED',
+      ]
+    >;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'> &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTenantTenant extends Struct.CollectionTypeSchema {
+  collectionName: 'tenants';
+  info: {
+    description: 'Client account owning every business record.';
+    displayName: 'Tenant';
+    pluralName: 'tenants';
+    singularName: 'tenant';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::tenant.tenant'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -954,6 +1257,11 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::channel-listing.channel-listing': ApiChannelListingChannelListing;
+      'api::marketplace-sync-event.marketplace-sync-event': ApiMarketplaceSyncEventMarketplaceSyncEvent;
+      'api::product.product': ApiProductProduct;
+      'api::sellable-unit.sellable-unit': ApiSellableUnitSellableUnit;
+      'api::tenant.tenant': ApiTenantTenant;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

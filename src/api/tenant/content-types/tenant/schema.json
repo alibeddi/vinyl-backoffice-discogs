@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tenants",
+  "info": {
+    "singularName": "tenant",
+    "pluralName": "tenants",
+    "displayName": "Tenant",
+    "description": "Client account owning every business record."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    }
+  }
+}

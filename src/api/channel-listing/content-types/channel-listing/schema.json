@@ -1,0 +1,63 @@
+{
+  "kind": "collectionType",
+  "collectionName": "channel_listings",
+  "info": {
+    "singularName": "channel-listing",
+    "pluralName": "channel-listings",
+    "displayName": "Channel Listing",
+    "description": "Publication state of a sellable unit on one marketplace channel."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "tenant": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::tenant.tenant",
+      "required": true
+    },
+    "sellableUnit": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::sellable-unit.sellable-unit",
+      "inversedBy": "channelListing",
+      "required": true
+    },
+    "channel": {
+      "type": "enumeration",
+      "enum": ["discogs"],
+      "default": "discogs",
+      "required": true
+    },
+    "externalListingId": {
+      "type": "string"
+    },
+    "externalUrl": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "not_published",
+        "pending",
+        "published",
+        "failed",
+        "removed",
+        "sync_error"
+      ],
+      "default": "not_published",
+      "required": true
+    },
+    "publishedPrice": {
+      "type": "decimal",
+      "min": 0
+    },
+    "lastSyncedAt": {
+      "type": "datetime"
+    },
+    "lastErrorMessage": {
+      "type": "text"
+    }
+  }
+}

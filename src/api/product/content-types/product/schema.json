@@ -1,0 +1,69 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "Product",
+    "description": "Catalogue record describing a vinyl release, independent of any physical copy."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "tenant": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::tenant.tenant",
+      "required": true
+    },
+    "productType": {
+      "type": "enumeration",
+      "enum": ["vinyl"],
+      "default": "vinyl",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "artist": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "label": {
+      "type": "string"
+    },
+    "year": {
+      "type": "integer",
+      "min": 1860
+    },
+    "country": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "catalogReference": {
+      "type": "string"
+    },
+    "barcode": {
+      "type": "string"
+    },
+    "discogsReleaseId": {
+      "type": "string"
+    },
+    "discogsMasterId": {
+      "type": "string"
+    },
+    "sellableUnits": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::sellable-unit.sellable-unit",
+      "mappedBy": "product"
+    }
+  }
+}

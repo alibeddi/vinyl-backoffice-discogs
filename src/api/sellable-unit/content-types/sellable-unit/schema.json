@@ -1,0 +1,97 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sellable_units",
+  "info": {
+    "singularName": "sellable-unit",
+    "pluralName": "sellable-units",
+    "displayName": "Sellable Unit",
+    "description": "One physical copy of a catalogue product, with its own price, grading and sale status."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "tenant": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::tenant.tenant",
+      "required": true
+    },
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product",
+      "inversedBy": "sellableUnits",
+      "required": true
+    },
+    "sku": {
+      "type": "string",
+      "unique": true
+    },
+    "price": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "currency": {
+      "type": "string",
+      "default": "EUR",
+      "required": true,
+      "maxLength": 3,
+      "minLength": 3
+    },
+    "mediaCondition": {
+      "type": "enumeration",
+      "enum": [
+        "MINT",
+        "NEAR_MINT",
+        "VERY_GOOD_PLUS",
+        "VERY_GOOD",
+        "GOOD_PLUS",
+        "GOOD",
+        "FAIR",
+        "POOR"
+      ]
+    },
+    "sleeveCondition": {
+      "type": "enumeration",
+      "enum": [
+        "MINT",
+        "NEAR_MINT",
+        "VERY_GOOD_PLUS",
+        "VERY_GOOD",
+        "GOOD_PLUS",
+        "GOOD",
+        "FAIR",
+        "POOR",
+        "GENERIC",
+        "NO_COVER",
+        "NOT_GRADED"
+      ]
+    },
+    "sellerComment": {
+      "type": "text"
+    },
+    "saleStatus": {
+      "type": "enumeration",
+      "enum": ["available", "reserved", "sold", "out_of_stock", "archived"],
+      "default": "available",
+      "required": true
+    },
+    "quantity": {
+      "type": "integer",
+      "default": 1,
+      "required": true,
+      "min": 0
+    },
+    "internalLocation": {
+      "type": "string"
+    },
+    "channelListing": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::channel-listing.channel-listing",
+      "mappedBy": "sellableUnit"
+    }
+  }
+}
